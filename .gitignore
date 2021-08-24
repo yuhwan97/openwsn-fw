@@ -14,6 +14,7 @@ settings
 /build
 /images
 /.sconsign.dblite
+/openstack/02a-MAClow/topology.c
 *.map
 *.lst
 *~
