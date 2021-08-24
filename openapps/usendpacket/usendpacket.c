@@ -44,6 +44,7 @@ void usendpacket_init(void) {
     // start periodic timer
     usendpacket_vars.timerId = opentimers_create(TIMER_GENERAL_PURPOSE, TASKPRIO_UDP);
 #ifdef PACKET_TEST
+    packet_test = FALSE;
     opentimers_scheduleIn(
         usendpacket_vars.timerId,
         USENDPACKET_PERIOD_MS,
@@ -52,7 +53,6 @@ void usendpacket_init(void) {
         usendpacket_timer_cb
     );
 #endif
-    //test 용 나중에 주석처리 ㄱ
 }
 
 void usendpacket_sendDone(OpenQueueEntry_t* msg, owerror_t error) {
@@ -88,7 +88,10 @@ void usendpacket_timer_cb(opentimers_id_t id){
 
 void usendpacket_task_cb(bool answer) {
     
-    //if(!trueClicked && !falseClicked) { return; }
+#ifdef PACKET_TEST
+    if (!packet_test) { return; }
+
+#endif
 
     OpenQueueEntry_t*    pkt;
     uint8_t              asnArray[5];

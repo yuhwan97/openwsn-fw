@@ -28,6 +28,7 @@ typedef struct {
     udp_resource_desc_t     desc;  ///< resource descriptor for this module, used to register at UDP stack
     bool      busySendingUsendpacket;  ///< TRUE when busy sending an uinject
 } usendpacket_vars_t;
+
 //=========================== prototypes ======================================
 
 void usendpacket_init(void);
