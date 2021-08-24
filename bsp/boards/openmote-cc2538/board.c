@@ -80,8 +80,6 @@ int main(void) {
 void board_init(void) {
    user_button_initialized = FALSE;
    sendpacket_initialized = FALSE;
-   trueClicked = FALSE;
-   falseClicked = FALSE;
    gpio_init();
    clock_init();
    board_timer_init();
@@ -368,11 +366,18 @@ static void GPIO_D_Handler(void) {
     IntMasterDisable();
     if (GPIOPinIntStatus(BSP_SENDPACKET_BASE, 1) & BSP_SENDPACKET_PIN ) {
         //falseClicked = TRUE;
+#ifdef PACKET_TEST
+        packet_test = false;
+#else
         usendpacket_task_cb(true);
-    
+#endif
     }
     if (GPIOPinIntStatus(BSP_SENDPACKET_BASE, 1) & BSP_SENDPACKET_FALSE_PIN) {
-        usendpacket_task_cb(false);
+#ifdef PACKET_TEST
+        packet_test = true;
+#else
+        usendpacket_task_cb(true);
+#endif
         
     }
     GPIOPinIntClear(BSP_SENDPACKET_BASE, BSP_SENDPACKET_PIN);

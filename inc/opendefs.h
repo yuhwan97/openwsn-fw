@@ -41,8 +41,9 @@ static const uint8_t infoStackName[] = "OpenWSN ";
 // maximum celllist length
 #define CELLLIST_MAX_LEN 5
 
-bool trueClicked;
-bool falseClicked;
+// for packet test
+#define PACKET_TEST
+bool packet_test;
 
 enum {
    E_SUCCESS                           = 0,
