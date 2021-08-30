@@ -30,15 +30,27 @@
 #include "pwm.h"
 #include "opendefs.h"
 
+
 //=========================== variables =======================================
+
 
 #define BSP_BUTTON_BASE                 ( GPIO_C_BASE )
 #define BSP_BUTTON_USER                 ( GPIO_PIN_3 )
 
-#define BSP_SENDPACKET_BASE             ( GPIO_D_BASE )
-#define BSP_SENDPACKET_PIN             ( GPIO_PIN_3)
 
-#define BSP_SENDPACKET_FALSE_PIN        ( GPIO_PIN_0)
+#define BSP_SENDPACKET_BASE             ( GPIO_D_BASE )
+#define BSP_SENDPACKET_PIN             ( GPIO_PIN_3 )
+
+
+#ifdef ENS_MOTE_R2_2
+
+#define BSP_SENDPACKET_FALSE_PIN        ( GPIO_PIN_2 )
+
+#else
+
+#define BSP_SENDPACKET_FALSE_PIN        ( GPIO_PIN_0 )
+
+#endif
 
 #ifdef REVA1 //Rev.A1 uses SF23 cc2538 which start at diffferent location
     #define CC2538_FLASH_ADDRESS            ( 0x0023F800 )
