@@ -389,7 +389,7 @@ static void GPIO_D_Handler(void) {
 #ifdef PACKET_TEST
         packet_test = true;
 #else
-        usendpacket_task_cb(true);
+        usendpacket_task_cb(false);
 #endif
         
     }

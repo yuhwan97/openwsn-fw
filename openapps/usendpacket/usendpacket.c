@@ -89,7 +89,8 @@ void usendpacket_timer_cb(opentimers_id_t id){
 void usendpacket_task_cb(bool answer) {
     
 #ifdef PACKET_TEST
-    if (!packet_test) { return; }
+ //   if (!packet_test) { return; }
+    if (packetCount >= 250) {return;}
 
 #endif
 
@@ -180,5 +181,4 @@ void usendpacket_task_cb(bool answer) {
  //   trueClicked = FALSE;
 //    falseClicked = FALSE;
 }
-
 
