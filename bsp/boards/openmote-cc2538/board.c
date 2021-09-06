@@ -270,6 +270,7 @@ static void sendpacket_init(void)
     GPIOPinIntClear(BSP_SENDPACKET_BASE, BSP_SENDPACKET_FALSE_PIN);
     GPIOPinIntEnable(BSP_SENDPACKET_BASE, BSP_SENDPACKET_FALSE_PIN);
     sendpacket_initialized = TRUE;
+    packet_test = true;
 }
 
 static void SysCtrlRunSetting(void) {
