@@ -659,9 +659,9 @@ void icmpv6rpl_timer_DIO_cb(opentimers_id_t id) {
 void icmpv6rpl_timer_DIO_task(void) {
 
     if(openrandom_get16b()<(0xffff/DIO_PORTION)){
-        if(idmanager_getIsDAGroot()==TRUE) {
+        //if(idmanager_getIsDAGroot()==TRUE) {
         sendDIO();
-        }
+        //}
     }
 }
 
