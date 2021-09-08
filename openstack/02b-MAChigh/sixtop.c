@@ -682,9 +682,9 @@ void sixtop_timeout_timer_cb(opentimers_id_t id) {
 void timer_sixtop_sendEb_fired(void) {
 
     if(openrandom_get16b()<(0xffff/EB_PORTION)){
-        if(idmanager_getIsDAGroot()==TRUE){
+        //if(idmanager_getIsDAGroot()==TRUE){
             sixtop_sendEB();
-        }
+        //}
     }
 }
 

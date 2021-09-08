@@ -182,4 +182,3 @@ void usendpacket_task_cb(bool answer) {
 //    falseClicked = FALSE;
 }
 
-
