@@ -38,16 +38,17 @@
 #define BSP_BUTTON_USER                 ( GPIO_PIN_3 )
 
 
-#define BSP_SENDPACKET_BASE             ( GPIO_D_BASE )
-#define BSP_SENDPACKET_PIN             ( GPIO_PIN_3 )
+
 
 
 #ifdef ENS_MOTE_R2_2
-
-#define BSP_SENDPACKET_FALSE_PIN        ( GPIO_PIN_2 )
+#define BSP_SENDPACKET_BASE             ( GPIO_B_BASE )
+#define BSP_SENDPACKET_PIN             ( GPIO_PIN_0 )
+#define BSP_SENDPACKET_FALSE_PIN        ( GPIO_PIN_1 )
 
 #else
-
+#define BSP_SENDPACKET_BASE             ( GPIO_D_BASE )
+#define BSP_SENDPACKET_PIN             ( GPIO_PIN_3 )
 #define BSP_SENDPACKET_FALSE_PIN        ( GPIO_PIN_0 )
 
 #endif
@@ -389,7 +390,7 @@ static void GPIO_D_Handler(void) {
 #ifdef PACKET_TEST
         packet_test = true;
 #else
-        usendpacket_task_cb(true);
+        usendpacket_task_cb(false);
 #endif
         
     }
