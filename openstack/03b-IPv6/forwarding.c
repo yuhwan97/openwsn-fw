@@ -127,8 +127,8 @@ owerror_t forwarding_send(OpenQueueEntry_t* msg) {
         dac = IPHC_DAC_STATEFUL;
     }
     // myprefix now contains the pointer to the correct prefix to use (link-local or global)
-    //memcpy(&(msg->l3_sourceAdd.addr_128b[0]),myprefix->prefix,8);
-    //memcpy(&(msg->l3_sourceAdd.addr_128b[8]),myadd64->addr_64b,8);
+    memcpy(&(msg->l3_sourceAdd.addr_128b[0]),myprefix->prefix,8);
+    memcpy(&(msg->l3_sourceAdd.addr_128b[8]),myadd64->addr_64b,8);
 
     // initialize IPv6 header
     memset(&ipv6_outer_header,0,sizeof(ipv6_header_iht));
