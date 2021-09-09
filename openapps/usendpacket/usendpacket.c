@@ -15,13 +15,15 @@
 
 usendpacket_vars_t usendpacket_vars;
 
-static  uint8_t usendpacket_payload_True[]    = "0Olicke";
-static  uint8_t usendpacket_payload_False[]   = "0Xlicke";
+
+static  uint8_t usendpacket_payload_True[]    = "0Omicke";
+static  uint8_t usendpacket_payload_False[]   = "0Xmicke";
 static const uint8_t usendapcket_dst_addr[]   = {
    0xbb, 0xbb, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01
 };
 uint8_t packetCount=1;
+
 //=========================== prototypes ======================================
 
 void usendpacket_timer_cb(opentimers_id_t id);
@@ -43,6 +45,10 @@ void usendpacket_init(void) {
     usendpacket_vars.period = USENDPACKET_PERIOD_MS;
     // start periodic timer
     usendpacket_vars.timerId = opentimers_create(TIMER_GENERAL_PURPOSE, TASKPRIO_UDP);
+
+    usendpacket_payload_True[2] = idmanager_getMyID(ADDR_16B)->addr_16b[1];
+    usendpacket_payload_False[2] = idmanager_getMyID(ADDR_16B)->addr_16b[1];
+    
 #ifdef PACKET_TEST
     packet_test = FALSE;
     opentimers_scheduleIn(
@@ -146,7 +152,6 @@ void usendpacket_task_cb(bool answer) {
     pkt->l4_sourcePortORicmpv6Type     = WKP_UDP_INJECT;
     pkt->l3_destinationAdd.type        = ADDR_128B;
     memcpy(&pkt->l3_destinationAdd.addr_128b[0],usendapcket_dst_addr,16);
-
     // add payload
     if (answer) {
         usendpacket_payload_True[0] = packetCount++;
@@ -157,7 +162,6 @@ void usendpacket_task_cb(bool answer) {
         usendpacket_payload_False[0] = packetCount++;
         packetfunctions_reserveHeaderSize(pkt,sizeof(usendpacket_payload_False)-1);
         memcpy(&pkt->payload[0],usendpacket_payload_False,sizeof(usendpacket_payload_False)-1);
-
     }
     packetfunctions_reserveHeaderSize(pkt,sizeof(uint16_t));
     pkt->payload[1] = (uint8_t)((usendpacket_vars.counter & 0xff00)>>8);
