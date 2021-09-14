@@ -18,6 +18,7 @@
 #include <source/gptimer.h>
 #include <source/sys_ctrl.h>
 
+#include "config.h"
 #include "board.h"
 #include "debugpins.h"
 #include "i2c.h"
@@ -27,6 +28,7 @@
 #include "sctimer.h"
 #include "uart.h"
 #include "cryptoengine.h"
+#include "pwm.h"
 
 //=========================== variables =======================================
 
@@ -34,25 +36,30 @@
 #define BSP_BUTTON_USER                 ( GPIO_PIN_3 )
 
 #ifdef REVA1 //Rev.A1 uses SF23 cc2538 which start at diffferent location
-    #define CC2538_FLASH_ADDRESS            ( 0x0023F800 )
+#define CC2538_FLASH_ADDRESS            ( 0x0023F800 )
 #else
-    #define CC2538_FLASH_ADDRESS            ( 0x0027F800 )
+#define CC2538_FLASH_ADDRESS            ( 0x0027F800 )
 #endif
 //=========================== prototypes ======================================
 
 void board_timer_init(void);
+
 uint32_t board_timer_get(void);
+
 bool board_timer_expired(uint32_t future);
 
 static void clock_init(void);
-static void gpio_init(void);
-static void button_init(void);
-static void antenna_init(void);
 
+static void gpio_init(void);
+
+static void button_init(void);
 
 static void SysCtrlDeepSleepSetting(void);
+
 static void SysCtrlSleepSetting(void);
+
 static void SysCtrlRunSetting(void);
+
 static void SysCtrlWakeupSetting(void);
 
 static void GPIO_C_Handler(void);
@@ -64,33 +71,36 @@ bool user_button_initialized;
 extern int mote_main(void);
 
 int main(void) {
-   return mote_main();
+    return mote_main();
 }
 
 //=========================== public ==========================================
 
 void board_init(void) {
-   user_button_initialized = FALSE;
-   
-   gpio_init();
-   clock_init();
-   antenna_init();
-   board_timer_init();
-   leds_init();
-   debugpins_init();
-   button_init();
-   sctimer_init();
-   uart_init();
-   radio_init();
-   i2c_init();
-   sensors_init();
-   cryptoengine_init();  
-}
+    user_button_initialized = FALSE;
 
-void antenna_init(void) {
-   //use cc2538 2.4ghz radio
-   GPIOPinWrite(BSP_ANTENNA_BASE, BSP_ANTENNA_CC2538_24GHZ, BSP_ANTENNA_CC2538_24GHZ);
-   GPIOPinWrite(BSP_ANTENNA_BASE, BSP_ANTENNA_AT215_24GHZ, 0);
+    gpio_init();
+    clock_init();
+    board_timer_init();
+    leds_init();
+    debugpins_init();
+    button_init();
+    sctimer_init();
+    uart_init();
+    radio_init();
+
+    i2c_init();
+
+#if BOARD_CRYPTOENGINE_ENABLED
+    cryptoengine_init();
+#endif
+
+
+#if BOARD_SENSORS_ENABLED
+    sensors_init();
+#endif
+
+   pwm_init();
 }
 
 /**
@@ -108,7 +118,7 @@ void board_sleep(void) {
 void board_timer_init(void) {
     // Configure the timer
     TimerConfigure(GPTIMER2_BASE, GPTIMER_CFG_PERIODIC_UP);
-    
+
     // Enable the timer
     TimerEnable(GPTIMER2_BASE, GPTIMER_BOTH);
 }
@@ -119,9 +129,9 @@ void board_timer_init(void) {
  */
 uint32_t board_timer_get(void) {
     uint32_t current;
-    
+
     current = TimerValueGet(GPTIMER2_BASE, GPTIMER_A) >> 5;
-    
+
     return current;
 }
 
@@ -135,8 +145,8 @@ bool board_timer_expired(uint32_t future) {
 
     current = TimerValueGet(GPTIMER2_BASE, GPTIMER_A) >> 5;
 
-    remaining = (int32_t) (future - current);
-    
+    remaining = (int32_t)(future - current);
+
     if (remaining > 0) {
         return false;
     } else {
@@ -148,6 +158,21 @@ bool board_timer_expired(uint32_t future) {
  * Resets the board
  */
 void board_reset(void) {
+    SysCtrlReset();
+}
+
+void board_resetFlash(void) {
+    if (!user_button_initialized) return;
+    /* Disable the interrupts */
+    IntMasterDisable();
+    leds_all_off();
+
+    /* Eras the CCA flash page */
+    FlashMainPageErase(CC2538_FLASH_ADDRESS);
+
+    leds_circular_shift();
+
+    /* Reset the board */
     SysCtrlReset();
 }
 
@@ -228,78 +253,80 @@ static void button_init(void) {
 }
 
 static void SysCtrlRunSetting(void) {
-  /* Disable General Purpose Timers 0, 1, 2, 3 when running */
-  SysCtrlPeripheralDisable(SYS_CTRL_PERIPH_GPT0);
-  SysCtrlPeripheralDisable(SYS_CTRL_PERIPH_GPT1);
-  SysCtrlPeripheralDisable(SYS_CTRL_PERIPH_GPT3);
+    /* Disable General Purpose Timers 0, 1, 2, 3 when running */
+    SysCtrlPeripheralDisable(SYS_CTRL_PERIPH_GPT0);
+    SysCtrlPeripheralDisable(SYS_CTRL_PERIPH_GPT1);
+    SysCtrlPeripheralDisable(SYS_CTRL_PERIPH_GPT3);
 
-  /* Disable SSI 0, 1 when running */
-  SysCtrlPeripheralDisable(SYS_CTRL_PERIPH_SSI0);
-  SysCtrlPeripheralDisable(SYS_CTRL_PERIPH_SSI1);
+    /* Disable SSI 0, 1 when running */
+    SysCtrlPeripheralDisable(SYS_CTRL_PERIPH_SSI0);
+    SysCtrlPeripheralDisable(SYS_CTRL_PERIPH_SSI1);
 
-  /* Disable UART1 when running */
-  SysCtrlPeripheralDisable(SYS_CTRL_PERIPH_UART1);
+    /* Disable UART1 when running */
+    SysCtrlPeripheralDisable(SYS_CTRL_PERIPH_UART1);
 
-  /* Disable I2C, AES and PKA when running */
-  SysCtrlPeripheralDisable(SYS_CTRL_PERIPH_I2C);
-  SysCtrlPeripheralDisable(SYS_CTRL_PERIPH_PKA);
-  SysCtrlPeripheralDisable(SYS_CTRL_PERIPH_AES);
+    /* Disable I2C, AES and PKA when running */
+    SysCtrlPeripheralDisable(SYS_CTRL_PERIPH_I2C);
+    SysCtrlPeripheralDisable(SYS_CTRL_PERIPH_PKA);
+    SysCtrlPeripheralDisable(SYS_CTRL_PERIPH_AES);
 
-  /* Enable UART0 and RFC when running */
-  SysCtrlPeripheralEnable(SYS_CTRL_PERIPH_GPT2);
-  SysCtrlPeripheralEnable(SYS_CTRL_PERIPH_UART0);
-  SysCtrlPeripheralEnable(SYS_CTRL_PERIPH_RFC);
+    /* Enable UART0 and RFC when running */
+    SysCtrlPeripheralEnable(SYS_CTRL_PERIPH_GPT2);
+    SysCtrlPeripheralEnable(SYS_CTRL_PERIPH_GPT3);
+    SysCtrlPeripheralEnable(SYS_CTRL_PERIPH_UART0);
+    SysCtrlPeripheralEnable(SYS_CTRL_PERIPH_RFC);
 }
 
 static void SysCtrlSleepSetting(void) {
-  /* Disable General Purpose Timers 0, 1, 2, 3 during sleep */
-  SysCtrlPeripheralSleepDisable(SYS_CTRL_PERIPH_GPT0);
-  SysCtrlPeripheralSleepDisable(SYS_CTRL_PERIPH_GPT1);
-  SysCtrlPeripheralSleepDisable(SYS_CTRL_PERIPH_GPT3);
+    /* Disable General Purpose Timers 0, 1, 2, 3 during sleep */
+    SysCtrlPeripheralSleepDisable(SYS_CTRL_PERIPH_GPT0);
+    SysCtrlPeripheralSleepDisable(SYS_CTRL_PERIPH_GPT1);
+    SysCtrlPeripheralSleepDisable(SYS_CTRL_PERIPH_GPT3);
 
-  /* Disable SSI 0, 1 during sleep */
-  SysCtrlPeripheralSleepDisable(SYS_CTRL_PERIPH_SSI0);
-  SysCtrlPeripheralSleepDisable(SYS_CTRL_PERIPH_SSI1);
+    /* Disable SSI 0, 1 during sleep */
+    SysCtrlPeripheralSleepDisable(SYS_CTRL_PERIPH_SSI0);
+    SysCtrlPeripheralSleepDisable(SYS_CTRL_PERIPH_SSI1);
 
-  /* Disable UART 0, 1 during sleep */
-  SysCtrlPeripheralSleepDisable(SYS_CTRL_PERIPH_UART1);
+    /* Disable UART 0, 1 during sleep */
+    SysCtrlPeripheralSleepDisable(SYS_CTRL_PERIPH_UART1);
 
-  /* Disable I2C, PKA, AES during sleep */
-  SysCtrlPeripheralSleepDisable(SYS_CTRL_PERIPH_I2C);
-  SysCtrlPeripheralSleepDisable(SYS_CTRL_PERIPH_PKA);
-  SysCtrlPeripheralSleepDisable(SYS_CTRL_PERIPH_AES);
+    /* Disable I2C, PKA, AES during sleep */
+    SysCtrlPeripheralSleepDisable(SYS_CTRL_PERIPH_I2C);
+    SysCtrlPeripheralSleepDisable(SYS_CTRL_PERIPH_PKA);
+    SysCtrlPeripheralSleepDisable(SYS_CTRL_PERIPH_AES);
 
-  /* Enable UART and RFC during sleep */
-  SysCtrlPeripheralSleepEnable(SYS_CTRL_PERIPH_GPT2);
-  SysCtrlPeripheralSleepEnable(SYS_CTRL_PERIPH_UART0);
-  SysCtrlPeripheralSleepEnable(SYS_CTRL_PERIPH_RFC);
+    /* Enable UART and RFC during sleep */
+    SysCtrlPeripheralSleepEnable(SYS_CTRL_PERIPH_GPT2);
+    SysCtrlPeripheralSleepEnable(SYS_CTRL_PERIPH_GPT3);
+    SysCtrlPeripheralSleepEnable(SYS_CTRL_PERIPH_UART0);
+    SysCtrlPeripheralSleepEnable(SYS_CTRL_PERIPH_RFC);
 }
 
 static void SysCtrlDeepSleepSetting(void) {
-  /* Disable General Purpose Timers 0, 1, 2, 3 during deep sleep */
-  SysCtrlPeripheralDeepSleepDisable(SYS_CTRL_PERIPH_GPT0);
-  SysCtrlPeripheralDeepSleepDisable(SYS_CTRL_PERIPH_GPT1);
-  SysCtrlPeripheralDeepSleepDisable(SYS_CTRL_PERIPH_GPT2);
-  SysCtrlPeripheralDeepSleepDisable(SYS_CTRL_PERIPH_GPT3);
+    /* Disable General Purpose Timers 0, 1, 2, 3 during deep sleep */
+    SysCtrlPeripheralDeepSleepDisable(SYS_CTRL_PERIPH_GPT0);
+    SysCtrlPeripheralDeepSleepDisable(SYS_CTRL_PERIPH_GPT1);
+    SysCtrlPeripheralDeepSleepDisable(SYS_CTRL_PERIPH_GPT2);
+    SysCtrlPeripheralDeepSleepDisable(SYS_CTRL_PERIPH_GPT3);
 
-  /* Disable SSI 0, 1 during deep sleep */
-  SysCtrlPeripheralDeepSleepDisable(SYS_CTRL_PERIPH_SSI0);
-  SysCtrlPeripheralDeepSleepDisable(SYS_CTRL_PERIPH_SSI1);
+    /* Disable SSI 0, 1 during deep sleep */
+    SysCtrlPeripheralDeepSleepDisable(SYS_CTRL_PERIPH_SSI0);
+    SysCtrlPeripheralDeepSleepDisable(SYS_CTRL_PERIPH_SSI1);
 
-  /* Disable UART 0, 1 during deep sleep */
-  SysCtrlPeripheralDeepSleepDisable(SYS_CTRL_PERIPH_UART0);
-  SysCtrlPeripheralDeepSleepDisable(SYS_CTRL_PERIPH_UART1);
+    /* Disable UART 0, 1 during deep sleep */
+    SysCtrlPeripheralDeepSleepDisable(SYS_CTRL_PERIPH_UART0);
+    SysCtrlPeripheralDeepSleepDisable(SYS_CTRL_PERIPH_UART1);
 
-  /* Disable I2C, PKA, AES during deep sleep */
-  SysCtrlPeripheralDeepSleepDisable(SYS_CTRL_PERIPH_I2C);
-  SysCtrlPeripheralDeepSleepDisable(SYS_CTRL_PERIPH_PKA);
-  SysCtrlPeripheralDeepSleepDisable(SYS_CTRL_PERIPH_AES);
-  SysCtrlPeripheralDeepSleepDisable(SYS_CTRL_PERIPH_RFC);
+    /* Disable I2C, PKA, AES during deep sleep */
+    SysCtrlPeripheralDeepSleepDisable(SYS_CTRL_PERIPH_I2C);
+    SysCtrlPeripheralDeepSleepDisable(SYS_CTRL_PERIPH_PKA);
+    SysCtrlPeripheralDeepSleepDisable(SYS_CTRL_PERIPH_AES);
+    SysCtrlPeripheralDeepSleepDisable(SYS_CTRL_PERIPH_RFC);
 }
 
 static void SysCtrlWakeupSetting(void) {
-  /* Allow the SMTimer to wake up the processor */
-  GPIOIntWakeupEnable(GPIO_IWE_SM_TIMER);
+    /* Allow the SMTimer to wake up the processor */
+    GPIOIntWakeupEnable(GPIO_IWE_SM_TIMER);
 }
 
 //=========================== interrupt handlers ==============================
@@ -318,7 +345,7 @@ static void GPIO_C_Handler(void) {
     FlashMainPageErase(CC2538_FLASH_ADDRESS);
 
     leds_circular_shift();
-    
+
     /* Reset the board */
     SysCtrlReset();
 }

@@ -1,6 +1,5 @@
 /**
 \brief Definition of the "openserial" driver.
-
 \author Fabien Chraim <chraim@eecs.berkeley.edu>, March 2012.
 \author Thomas Watteyne <thomas.watteyne@inria.fr>, August 2016.
 */
@@ -518,10 +517,8 @@ void openserial_inhibitStop(void) {
 
 /**
 \brief Trigger this module to print status information, over serial.
-
 debugPrint_* functions are used by the openserial module to continuously print
 status information about several modules in the OpenWSN stack.
-
 \returns TRUE if this function printed something, FALSE otherwise.
 */
 bool debugPrint_outBufferIndexes(void) {
@@ -1046,7 +1043,6 @@ void isr_openserial_tx(void) {
 
 /**
 \pre executed in ISR, called from scheduler.c
-
 \returns 1 if don't receiving frame, 0 if not
 */
 
@@ -1112,6 +1108,3 @@ uint8_t isr_openserial_rx(void) {
 
     return returnVal;
 }
-
-
-
