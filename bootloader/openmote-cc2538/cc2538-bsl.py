@@ -115,20 +115,14 @@ class FirmwareFile(object):
     def __init__(self, path):
         """
         Read a firmware file and store its data ready for device programming.
-
         This class will try to guess the file type if python-magic is available.
-
         If python-magic indicates a plain text file, and if IntelHex is
         available, then the file will be treated as one of Intel HEX format.
-
         In all other cases, the file will be treated as a raw binary file.
-
         In both cases, the file's contents are stored in bytes for subsequent
         usage to program a device or to perform a crc check.
-
         Parameters:
             path -- A str with the path to the firmware file.
-
         Attributes:
             bytes: A bytearray with firmware contents ready to send to the device
         """
@@ -178,7 +172,6 @@ class FirmwareFile(object):
     def crc32(self):
         """
         Return the crc32 checksum of the firmware image
-
         Return:
             The firmware's CRC32, ready for comparison with the CRC
             returned by the ROM bootloader's COMMAND_CRC32
@@ -908,11 +901,9 @@ def usage():
     --bootloader-invert-lines Inverts the use of RTS and DTR to enter bootloader
     -D, --disable-bootloader After finishing, disable the bootloader
     --version                Print script version
-
 Examples:
     ./%s -e -w -v example/main.bin
     ./%s -e -w -v --ieee-address 00:12:4b:aa:bb:cc:dd:ee example/main.bin
-
     """ % (sys.argv[0],sys.argv[0],sys.argv[0]))
 
 if __name__ == "__main__":

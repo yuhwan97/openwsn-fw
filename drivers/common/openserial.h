@@ -1,6 +1,5 @@
 /**
 \brief Declaration of the "openserial" driver.
-
 \author Fabien Chraim <chraim@eecs.berkeley.edu>, March 2012.
 \author Thomas Watteyne <thomas.watteyne@inria.fr>, August 2016.
 */
@@ -25,7 +24,6 @@
 
 /**
 \brief Number of bytes of the serial output buffer, in bytes.
-
 \warning should be exactly 256 so wrap-around on the index does not require
          the use of a slow modulo operator.
 */
@@ -34,7 +32,6 @@
 
 /**
 \brief Number of bytes of the serial input buffer, in bytes.
-
 \warning Do not pick a number greater than 255, since its filling level is
          encoded by a single byte in the code.
 */

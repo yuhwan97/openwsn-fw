@@ -507,7 +507,7 @@
               <FilePath>..\..\..\drivers\common\openhdlc.c</FilePath>
             </File>
             <File>
-              <FileName>openserial.c</FileName>
+              <FileName></FileName>
               <FileType>1</FileType>
               <FilePath>..\..\..\drivers\common\openserial.c</FilePath>
             </File>

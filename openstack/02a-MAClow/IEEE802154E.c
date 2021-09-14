@@ -1026,6 +1026,7 @@ port_INLINE void activity_ti1ORri1(void) {
                     //copy synch IE  -- should be Little endian???
                     // fill in the ASN field of the EB
                     ieee154e_getAsn(asn);
+                    
                     join_priority = (icmpv6rpl_getMyDAGrank()/MINHOPRANKINCREASE)-1; //poipoi -- use dagrank(rank)-1
                     memcpy(ieee154e_vars.dataToSend->l2_ASNpayload,&asn[0],sizeof(asn_t));
                     memcpy(ieee154e_vars.dataToSend->l2_ASNpayload+sizeof(asn_t),&join_priority,sizeof(uint8_t));

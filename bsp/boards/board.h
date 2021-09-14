@@ -6,9 +6,7 @@
 \{
 \addtogroup board
 \{
-
 \brief Cross-platform declaration "board" bsp module.
-
 \author Thomas Watteyne <watteyne@eecs.berkeley.edu>, February 2012.
 */
 
