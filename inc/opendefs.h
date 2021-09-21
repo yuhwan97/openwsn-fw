@@ -43,7 +43,7 @@ static const uint8_t infoStackName[] = "OpenWSN ";
 
 // for packet test
 //#define PACKET_TEST
-//#define ENS_MOTE_R2_2
+#define ENS_MOTE_R2_2
 bool packet_test;
 
 enum {
