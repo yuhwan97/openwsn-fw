@@ -1146,7 +1146,13 @@ port_INLINE void activity_ti2(void) {
             return;
         }
     }
-
+    bool ebeb = false;
+    if(ieee154e_vars.dataToSend->creator != COMPONENT_ICMPv6RPL) ebeb = true;
+    
+    if(schedule_getShared() && ebeb) openserial_printInfo(COMPONENT_SCHEDULE , 199, 1, ieee154e_vars.asn.bytes0and1);
+    //(errorparameter_t)ieee154e_vars.slotOffset
+    if(schedule_getShared() && !ebeb) openserial_printInfo(COMPONENT_SCHEDULE , 199, 2, ieee154e_vars.asn.bytes0and1);
+    
     // add 2 CRC bytes only to the local copy as we end up here for each retransmission
     packetfunctions_reserveFooterSize(&ieee154e_vars.localCopyForTransmission, 2);
 

@@ -75,7 +75,7 @@ static void SysCtrlRunSetting(void);
 static void SysCtrlWakeupSetting(void);
 
 static void GPIO_C_Handler(void);
-static void GPIO_D_Handler(void);
+static void GPIO_B_Handler(void);
 
 bool user_button_initialized;
 bool sendpacket_initialized;
@@ -264,14 +264,13 @@ static void sendpacket_init(void)
     GPIOIntTypeSet(BSP_SENDPACKET_BASE, BSP_SENDPACKET_PIN, GPIO_FALLING_EDGE);
     GPIOIntTypeSet(BSP_SENDPACKET_BASE, BSP_SENDPACKET_FALSE_PIN, GPIO_FALLING_EDGE);
     
-    GPIOPortIntRegister(BSP_SENDPACKET_BASE, GPIO_D_Handler);
+    GPIOPortIntRegister(BSP_SENDPACKET_BASE, GPIO_B_Handler);
 
     GPIOPinIntClear(BSP_SENDPACKET_BASE, BSP_SENDPACKET_PIN);
     GPIOPinIntEnable(BSP_SENDPACKET_BASE, BSP_SENDPACKET_PIN);
     GPIOPinIntClear(BSP_SENDPACKET_BASE, BSP_SENDPACKET_FALSE_PIN);
     GPIOPinIntEnable(BSP_SENDPACKET_BASE, BSP_SENDPACKET_FALSE_PIN);
     sendpacket_initialized = TRUE;
-    packet_test = true;
 }
 
 static void SysCtrlRunSetting(void) {
@@ -373,13 +372,13 @@ static void GPIO_C_Handler(void) {
 }
 
 
-static void GPIO_D_Handler(void) {
+static void GPIO_B_Handler(void) {
     if (!sendpacket_initialized) return;
     /* Disable the interrupts */
     
     IntMasterDisable();
     if (GPIOPinIntStatus(BSP_SENDPACKET_BASE, 1) & BSP_SENDPACKET_PIN ) {
-        //falseClicked = TRUE;
+    
 #ifdef PACKET_TEST
         packet_test = false;
 #else
