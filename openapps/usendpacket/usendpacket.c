@@ -96,7 +96,7 @@ void usendpacket_task_cb(bool answer) {
     
 #ifdef PACKET_TEST
  //   if (!packet_test) { return; }
-    if (packetCount >= 251) {return;}
+    if (packetCount >= 181) {return;}
 
 #endif
 
