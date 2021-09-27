@@ -36,13 +36,13 @@ static const uint8_t infoStackName[] = "OpenWSN ";
 #define LENGTH_ADDR64b   8
 #define LENGTH_ADDR128b  16
 
-#define MAXNUMNEIGHBORS  30
+#define MAXNUMNEIGHBORS  40
 
 // maximum celllist length
 #define CELLLIST_MAX_LEN 5
 
 // for packet test
-#define PACKET_TEST
+//#define PACKET_TEST
 #define ENS_MOTE_R2_2
 bool packet_test;
 

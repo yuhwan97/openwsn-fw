@@ -99,7 +99,7 @@ void usendpacket_task_cb(bool answer) {
     if (packetCount >= 181) {return;}
 
 #endif
-
+    
     OpenQueueEntry_t*    pkt;
     uint8_t              asnArray[5];
     open_addr_t          parentNeighbor;
@@ -129,9 +129,10 @@ void usendpacket_task_cb(bool answer) {
         // don't continue if I'm still sending a previous uinject packet
         return;
     }
+    //uint8_t cmsg = openqueue_check_controlMSG();
 
     // if you get here, send a packet
-    openserial_printInfo(COMPONENT_UINJECT, 255, answer, packetCount);
+    openserial_printInfo(COMPONENT_UINJECT, 255, 1, answer);
     
     // get a free packet buffer
     pkt = openqueue_getFreePacketBuffer(COMPONENT_UINJECT);

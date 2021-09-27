@@ -38,6 +38,7 @@ OpenQueueEntry_t*  openqueue_getFreePacketBuffer(uint8_t creator);
 owerror_t          openqueue_freePacketBuffer(OpenQueueEntry_t* pkt);
 void               openqueue_removeAllCreatedBy(uint8_t creator);
 bool               openqueue_isHighPriorityEntryEnough(void);
+uint8_t            openqueue_check_controlMSG(void);
 // called by ICMPv6
 void               openqueue_updateNextHopPayload(open_addr_t* newNextHop);
 // called by res
