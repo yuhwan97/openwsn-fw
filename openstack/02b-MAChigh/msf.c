@@ -207,7 +207,7 @@ void msf_timer_clear_task(void){
     }
 
     sixtop_request(
-        IANA_6TOP_CMD_CLEAR,                // code
+        _CLEAR,                // code
         &neighbor,                          // neighbor
         NUMCELLS_MSF,                       // number cells
         CELLOPTIONS_MSF,                    // cellOptions
