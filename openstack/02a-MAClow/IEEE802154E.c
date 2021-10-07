@@ -853,7 +853,7 @@ port_INLINE bool ieee154e_processIEs(OpenQueueEntry_t* pkt, uint16_t* lenIE) {
 port_INLINE void activity_ti1ORri1(void) {
     cellType_t  cellType;
     open_addr_t neighbor;
-    open_addr_t autonomousUnicastNeighbor;
+    open_addr_t UnicastNeighbor;
     uint8_t     i;
     uint8_t     asn[5];
     uint8_t     join_priority;
@@ -965,7 +965,7 @@ port_INLINE void activity_ti1ORri1(void) {
                 if (packetfunctions_isBroadcastMulticast(&neighbor)==FALSE){
 
                     if (schedule_getShared()){
-                        // this is an autonomous TxRx cell (unicast)
+                        // this is an  TxRx cell (unicast)
                         ieee154e_vars.dataToSend = openqueue_macGet6PandJoinPacket(&neighbor);
                     } else {
                         // this is a managed Tx cell
@@ -992,15 +992,15 @@ port_INLINE void activity_ti1ORri1(void) {
                             ieee154e_vars.dataToSend = openqueue_macGetEBPacket();
                         }
                     } else {
-                        // this is autonomous TXRX cell (anycast)
+                        // this is  TXRX cell (anycast)
                         if (msf_getHashCollisionFlag()==TRUE){
                             // check whether there is 6p or join request packet to send first
                             ieee154e_vars.dataToSend = openqueue_macGet6PandJoinPacket(&neighbor);
                         }
 
                         if (ieee154e_vars.dataToSend == NULL) {
-                            if (schedule_getAutonomousTxRxCellUnicastNeighbor(&autonomousUnicastNeighbor)==TRUE){
-                                ieee154e_vars.dataToSend = openqueue_macGet6PRequestOnAnycast(&autonomousUnicastNeighbor);
+                            if (schedule_getTxRxCellUnicastNeighbor(&UnicastNeighbor)==TRUE){
+                                ieee154e_vars.dataToSend = openqueue_macGet6PRequestOnAnycast(&UnicastNeighbor);
                             }
                         }
 
@@ -1952,7 +1952,7 @@ port_INLINE void activity_ri5(PORT_TIMER_WIDTH capturedTime) {
         } else {
             // synchronize to the received packet if I'm not a DAGroot and this is my preferred parent
             // or in case I'm in the middle of the join process when parent is not yet selected
-            // or in case I don't have an autonomous Tx cell cell to my parent yet
+            // or in case I don't have an  Tx cell cell to my parent yet
             if (
                 idmanager_getIsDAGroot()                                    == FALSE &&
                 (

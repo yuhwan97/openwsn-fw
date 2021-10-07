@@ -917,7 +917,7 @@ port_INLINE void sixtop_sendKA(void) {
 
 void timer_sixtop_six2six_timeout_fired(void) {
 
-    if (sixtop_vars.six2six_state == SIX_STATE_WAIT_CLEARRESPONSE){
+    if (sixtop_vars.six2six_state == SIX_STATE_WAIT_){
         // no response for the 6p clear, just clear locally
         schedule_removeAllManagedUnicastCellsToNeighbor(
             sixtop_vars.cb_sf_getMetadata(),
@@ -1593,7 +1593,7 @@ void sixtop_six2six_notifyReceive(
                 );
                 neighbors_updateSequenceNumber(&(pkt->l2_nextORpreviousHop));
                 break;
-            case SIX_STATE_WAIT_CLEARRESPONSE:
+            case SIX_STATE_WAIT_:
                 schedule_removeAllManagedUnicastCellsToNeighbor(
                     sixtop_vars.cb_sf_getMetadata(),
                     &(pkt->l2_nextORpreviousHop)
