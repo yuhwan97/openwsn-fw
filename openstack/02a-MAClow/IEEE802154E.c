@@ -985,14 +985,19 @@ port_INLINE void activity_ti1ORri1(void) {
                 } else {
                     if (schedule_getShared()) {
                         // this is minimal cell
-                        ieee154e_vars.dataToSend = openqueue_macGetDIOPacket();
-                        if (ieee154e_vars.dataToSend==NULL){
+                        if (schedule_getSlotOffset() == 0) {
                             couldSendEB=TRUE;
                             // look for an EB packet in the queue
                             ieee154e_vars.dataToSend = openqueue_macGetEBPacket();
                         }
-                    } else {
-                        // this is  TXRX cell (anycast)
+                        
+                        if(schedule_getSlotOffset() == 1) {
+                            ieee154e_vars.dataToSend = openqueue_macGetDIOPacket();
+                        }
+                        
+                    }
+                    else {
+                        // this is autonomous TXRX cell (anycast)
                         if (msf_getHashCollisionFlag()==TRUE){
                             // check whether there is 6p or join request packet to send first
                             ieee154e_vars.dataToSend = openqueue_macGet6PandJoinPacket(&neighbor);
@@ -1146,12 +1151,12 @@ port_INLINE void activity_ti2(void) {
             return;
         }
     }
+    //
     bool ebeb = false;
     if(ieee154e_vars.dataToSend->creator != COMPONENT_ICMPv6RPL) ebeb = true;
-    
-    if(schedule_getShared() && ebeb) openserial_printInfo(COMPONENT_SCHEDULE , 199, 1, ieee154e_vars.asn.bytes0and1);
+    if(schedule_getShared() && ebeb) openserial_printInfo(COMPONENT_SCHEDULE , 199, 1, (errorparameter_t)ieee154e_vars.asn.bytes0and1);
     //(errorparameter_t)ieee154e_vars.slotOffset
-    if(schedule_getShared() && !ebeb) openserial_printInfo(COMPONENT_SCHEDULE , 199, 2, ieee154e_vars.asn.bytes0and1);
+    if(schedule_getShared() && !ebeb) openserial_printInfo(COMPONENT_SCHEDULE , 199, 2, (errorparameter_t)ieee154e_vars.asn.bytes0and1);
     
     // add 2 CRC bytes only to the local copy as we end up here for each retransmission
     packetfunctions_reserveFooterSize(&ieee154e_vars.localCopyForTransmission, 2);

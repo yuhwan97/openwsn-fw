@@ -832,6 +832,19 @@ bool schedule_getShared(void) {
     return returnVal;
 }
 
+uint8_t schedule_getSlotOffset(void) {
+    uint8_t offset;
+
+    INTERRUPT_DECLARATION();
+    DISABLE_INTERRUPTS();
+
+    offset = schedule_vars.currentScheduleEntry->slotOffset;
+
+    ENABLE_INTERRUPTS();
+
+    return offset;
+}
+
 /**
 \brief Get the neighbor associated wit the current schedule entry.
 
@@ -970,8 +983,8 @@ void schedule_indicateTx(asn_t* asnTimestamp, bool succesfullTx) {
     memcpy(&schedule_vars.currentScheduleEntry->lastUsedAsn, asnTimestamp, sizeof(asn_t));
 
     // update this backoff parameters for shared slots
-    if (schedule_vars.currentScheduleEntry->shared==TRUE) {
-        if (succesfullTx==TRUE) {
+    if (schedule_vars.currentScheduleEntry->shared==TRUE) { //공유셀인 경우
+        if (succesfullTx==TRUE) { 
             if (schedule_vars.currentScheduleEntry->neighbor.type==ADDR_ANYCAST){
                 // reset backoffExponent
                 schedule_vars.backoffExponenton     = MINBE-1;

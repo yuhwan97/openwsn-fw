@@ -20,7 +20,7 @@ The superframe reappears over time and can be arbitrarily long.
 #define SLOTFRAME_LENGTH     89//should be 101
 
 //draft-ietf-6tisch-minimal-06
-#define SCHEDULE_MINIMAL_6TISCH_ACTIVE_CELLS                      1
+#define SCHEDULE_MINIMAL_6TISCH_ACTIVE_CELLS                      2
 #define SCHEDULE_MINIMAL_6TISCH_SLOTOFFSET                        0
 #define SCHEDULE_MINIMAL_6TISCH_CHANNELOFFSET                     0
 #define SCHEDULE_MINIMAL_6TISCH_DEFAULT_SLOTFRAME_HANDLE          0 //id of slotframe
@@ -37,7 +37,7 @@ The superframe reappears over time and can be arbitrarily long.
   for serial port to transmit data to dagroot.
 */
 
-#define NUMSLOTSOFF         60
+#define NUMSLOTSOFF          60
 
 /**
 \brief Maximum number of active slots in a superframe.
@@ -195,6 +195,7 @@ slotOffset_t       schedule_getNextActiveSlotOffset(void);
 frameLength_t      schedule_getFrameLength(void);
 cellType_t         schedule_getType(void);
 bool               schedule_getShared(void);
+uint8_t            schedule_getSlotOffset(void);
 void               schedule_getNeighbor(open_addr_t* addrToWrite);
 channelOffset_t    schedule_getChannelOffset(void);
 bool               schedule_getOkToSend(void);

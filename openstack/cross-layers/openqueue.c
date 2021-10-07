@@ -325,8 +325,10 @@ bool openqueue_isHighPriorityEntryEnough(void) {
     DISABLE_INTERRUPTS();
 
     numberOfEntry = 0;
+    
     for (i=0;i<QUEUELENGTH;i++) {
         if(openqueue_vars.queue[i].creator>COMPONENT_SIXTOP_RES){
+            
             numberOfEntry++;
         }
     }
@@ -338,6 +340,20 @@ bool openqueue_isHighPriorityEntryEnough(void) {
       ENABLE_INTERRUPTS();
         return TRUE;
     }
+}
+uint8_t openqueue_check_controlMSG(void) {
+    uint8_t i;
+    uint8_t cmsg = 0;
+    INTERRUPT_DECLARATION();
+    DISABLE_INTERRUPTS();
+
+    for (i=0;i<QUEUELENGTH;i++) {
+        if((openqueue_vars.queue[i].creator <= COMPONENT_OPENCOAP) && (openqueue_vars.queue[i].creator > COMPONENT_NULL)){
+            cmsg++;
+        }
+    }
+    ENABLE_INTERRUPTS();
+    return cmsg;
 }
 
 OpenQueueEntry_t* openqueue_macGetEBPacket(void) {
