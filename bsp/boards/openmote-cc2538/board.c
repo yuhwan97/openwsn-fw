@@ -40,15 +40,16 @@
 
 
 
-
+// 신형 모트 포트
 #ifdef ENS_MOTE_R2_2
 #define BSP_SENDPACKET_BASE             ( GPIO_B_BASE )
-#define BSP_SENDPACKET_PIN             ( GPIO_PIN_0 )
+#define BSP_SENDPACKET_TRUE_PIN             ( GPIO_PIN_0 )
 #define BSP_SENDPACKET_FALSE_PIN        ( GPIO_PIN_1 )
 
+// 구형 모트 포트
 #else
 #define BSP_SENDPACKET_BASE             ( GPIO_D_BASE )
-#define BSP_SENDPACKET_PIN             ( GPIO_PIN_3 )
+#define BSP_SENDPACKET_TRUE_PIN             ( GPIO_PIN_3 )
 #define BSP_SENDPACKET_FALSE_PIN        ( GPIO_PIN_0 )
 
 #endif
@@ -245,6 +246,7 @@ static void button_init(void) {
     user_button_initialized = TRUE;
 }
 
+// 버튼 GPIO 설정
 static void sendpacket_init(void)
 {
     volatile uint32_t i;
@@ -252,22 +254,22 @@ static void sendpacket_init(void)
     /* Delay to avoid pin floating problems */
     for (i = 0xFFFF; i != 0; i--);
 
-    GPIOPinIntDisable(BSP_SENDPACKET_BASE, BSP_SENDPACKET_PIN);
-    GPIOPinIntClear(BSP_SENDPACKET_BASE, BSP_SENDPACKET_PIN);
+    GPIOPinIntDisable(BSP_SENDPACKET_BASE, BSP_SENDPACKET_TRUE_PIN);
+    GPIOPinIntClear(BSP_SENDPACKET_BASE, BSP_SENDPACKET_TRUE_PIN);
 
     GPIOPinIntDisable(BSP_SENDPACKET_BASE, BSP_SENDPACKET_FALSE_PIN);
     GPIOPinIntClear(BSP_SENDPACKET_BASE, BSP_SENDPACKET_FALSE_PIN);
     
-    GPIOPinTypeGPIOInput(BSP_SENDPACKET_BASE, BSP_SENDPACKET_PIN);
+    GPIOPinTypeGPIOInput(BSP_SENDPACKET_BASE, BSP_SENDPACKET_TRUE_PIN);
     GPIOPinTypeGPIOInput(BSP_SENDPACKET_BASE, BSP_SENDPACKET_FALSE_PIN);
 
-    GPIOIntTypeSet(BSP_SENDPACKET_BASE, BSP_SENDPACKET_PIN, GPIO_FALLING_EDGE);
+    GPIOIntTypeSet(BSP_SENDPACKET_BASE, BSP_SENDPACKET_TRUE_PIN, GPIO_FALLING_EDGE);
     GPIOIntTypeSet(BSP_SENDPACKET_BASE, BSP_SENDPACKET_FALSE_PIN, GPIO_FALLING_EDGE);
     
     GPIOPortIntRegister(BSP_SENDPACKET_BASE, GPIO_B_Handler);
 
-    GPIOPinIntClear(BSP_SENDPACKET_BASE, BSP_SENDPACKET_PIN);
-    GPIOPinIntEnable(BSP_SENDPACKET_BASE, BSP_SENDPACKET_PIN);
+    GPIOPinIntClear(BSP_SENDPACKET_BASE, BSP_SENDPACKET_TRUE_PIN);
+    GPIOPinIntEnable(BSP_SENDPACKET_BASE, BSP_SENDPACKET_TRUE_PIN);
     GPIOPinIntClear(BSP_SENDPACKET_BASE, BSP_SENDPACKET_FALSE_PIN);
     GPIOPinIntEnable(BSP_SENDPACKET_BASE, BSP_SENDPACKET_FALSE_PIN);
     sendpacket_initialized = TRUE;
@@ -371,29 +373,22 @@ static void GPIO_C_Handler(void) {
     SysCtrlReset();
 }
 
-
+// 인터럽트 핸들러
+// 버튼 입력에 따라 다른 값을 전송
 static void GPIO_B_Handler(void) {
     if (!sendpacket_initialized) return;
     /* Disable the interrupts */
     
     IntMasterDisable();
-    if (GPIOPinIntStatus(BSP_SENDPACKET_BASE, 1) & BSP_SENDPACKET_PIN ) {
-    
-#ifdef PACKET_TEST
-        packet_test = false;
-#else
+    if (GPIOPinIntStatus(BSP_SENDPACKET_BASE, 1) & BSP_SENDPACKET_TRUE_PIN ) {
         usendpacket_task_cb(true);
-#endif
     }
     if (GPIOPinIntStatus(BSP_SENDPACKET_BASE, 1) & BSP_SENDPACKET_FALSE_PIN) {
-#ifdef PACKET_TEST
-        packet_test = true;
-#else
         usendpacket_task_cb(false);
-#endif
+
         
     }
-    GPIOPinIntClear(BSP_SENDPACKET_BASE, BSP_SENDPACKET_PIN);
+    GPIOPinIntClear(BSP_SENDPACKET_BASE, BSP_SENDPACKET_TRUE_PIN);
     GPIOPinIntClear(BSP_SENDPACKET_BASE, BSP_SENDPACKET_FALSE_PIN);
     IntMasterEnable();
     
